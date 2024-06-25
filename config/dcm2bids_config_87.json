@@ -1,0 +1,65 @@
+{
+    "Manufacturer": "Hyperfine",
+    "ManufacturersModelName": "Swoop",
+    "Modality": "MR",
+    "MagneticFieldStrength": 0.064,
+    "dcm2niixOptions": "-b y -ba y -z y -f '%3s_%f_%p_%t' -x i",
+    "descriptions": [
+        {
+            "datatype": "anat",
+            "suffix": "T2w",
+            "custom_entities":"rec-axi",
+            "criteria": {
+              "SeriesDescription": "*T2*AXI*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "T2w",
+            "custom_entities":"rec-axi",
+            "criteria": {
+              "SeriesDescription": "*T2*axi*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "T2w",
+            "custom_entities":"rec-cor",
+            "criteria": {
+              "SeriesDescription": "*T2*COR*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "T2w",
+            "custom_entities":"rec-cor",
+            "criteria": {
+              "SeriesDescription": "*T2*cor*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "T2w",
+            "custom_entities":"rec-sag",
+            "criteria": {
+              "SeriesDescription": "*T2*SAG*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "T2w",
+            "custom_entities":"rec-sag",
+            "criteria": {
+              "SeriesDescription": "*T2*sag*"
+            }
+        },
+        {
+            "datatype": "anat",
+            "suffix": "PDw",
+            "custom_entities":"acq-temperature",
+            "criteria": {
+              "SeriesDescription": "*FISP*"
+            }
+        }
+    ]
+}
