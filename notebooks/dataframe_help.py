@@ -1,16 +1,24 @@
 import pandas as pd
 from tqdm import tqdm
+import numpy as np
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-def add_temperature_w0(df, data_path):
-    print()
-    df_temp = pd.read_csv(f'{data_path}/fisp_temperature_w0.csv')
+
+def add_temperature_w0_sw(df, data_path):
+    df_temp = pd.read_csv(f'{data_path}/session_params.csv')
     df_temp['Temperature'] = 24-df_temp['n_black']
 
     df['Temperature'] = None
     df['w0'] = None
-    for i,row in tqdm(df.iterrows(), desc="Adding in temperature and w0", total=len(df)):
+    df['SoftwareVersions'] = None
+
+    for i,row in tqdm(df.iterrows(), desc="Adding in temperature, w0 and SW", total=len(df)):
         df.at[i,'Temperature'] = df_temp[(df_temp['Subject']==row.Subject) & (df_temp['Session']==row.Session)].Temperature.values
         df.at[i,'w0'] = df_temp[(df_temp['Subject']==row.Subject) & (df_temp['Session']==row.Session)].w0.values
+        df.at[i,'SoftwareVersions'] = df_temp[(df_temp['Subject']==row.Subject) & (df_temp['Session']==row.Session)].SW.values[0]
 
     df.Temperature = df.Temperature.astype('float64')
     df.w0 = df.w0.astype('float64')
@@ -43,8 +51,8 @@ def calc_contrast(df_master, con_ref):
             D = {}
             D['Subject'] = [sub]
             D['Session'] = [ses]
-            D['Adult WM/GM Contrast'] = [adult_wm/adult_gm]
-            D['Neonatal WM/GM Contrast'] = [neo_wm/neo_gm]
+            D['Adult WM/GM Contrast'] = [(adult_wm-adult_gm)/ses_df[ses_df.Seg==con_ref['Adult']['WM']['Seg']].Mean.mean()]
+            D['Neonatal WM/GM Contrast'] = [(neo_wm-neo_gm)/ses_df[ses_df.Seg==con_ref['Neo']['WM']['Seg']].Mean.mean()]
             D['SoftwareVersions'] = sub_df.SoftwareVersions.unique()[0]
 
             df_contrast = pd.concat((df_contrast, pd.DataFrame.from_dict(D)), ignore_index=True)
@@ -92,3 +100,93 @@ def add_relaxometry(df, results_path):
     df.Conc = df.Conc.astype('float64')
 
     return df
+
+def add_subject_lines(ax, df, mixed_lm_res, param):
+    slope = mixed_lm_res.params[param]
+    intercept = mixed_lm_res.params.Intercept
+
+    for l in ax.get_lines():
+        ll = l.get_label()
+        if 'P0' in ll:
+            c = l.get_color()
+            xmin = df[df['Subject']==ll][param].min()
+            xmax = df[df['Subject']==ll][param].max()
+            
+            if xmax==24: # Since we censured data at temperature=24
+                xmax = 23
+            
+            x = np.linspace(xmin, xmax)
+            inter = mixed_lm_res.random_effects[ll].Group
+            ax.plot(x, x*slope + inter + intercept, color=c)
+
+def remove_seaborn_legends(ax):
+    handles, labels = ax.get_legend_handles_labels()
+    handles = [handle for handle, label in zip(handles, labels) if 'P0' not in label]
+    labels = [label for label in labels if 'P0' not in label]
+    ax.legend(handles=handles, labels=labels)
+
+def make_fitline_str_e(res, param, y, x):
+    intercept = res['Intercept']
+    slope = res[param]
+    m_base, m_exp = f"{intercept:.2e}".split('e')
+    k_base, k_exp = f"{abs(slope):.2e}".split('e')
+
+    sign = '-' if slope < 0 else '+'
+
+    s = rf'{y}$ = {m_base}\cdot 10^{int(m_exp)} {sign} {x} \cdot {k_base} \cdot 10^{int(k_exp)} $'
+
+    return s
+
+def make_global_group_comparison(df, x_var, y_var, filter_temp=False):
+    if filter_temp:
+        my_df = df[df.Temperature<24]
+    else:
+        my_df = df.copy()
+
+    y = my_df[y_var]
+    X = sm.add_constant(my_df[x_var])
+    ols_model = smf.ols(f'{y_var} ~ {x_var}', data=my_df)
+    ols_res = ols_model.fit()
+    slope = ols_res.params[x_var]
+    intercept = ols_res.params.Intercept
+    print(ols_res.summary())
+
+    fig, ax = plt.subplots(1,1)
+    sns.scatterplot(data=my_df, x=x_var, y=y_var, hue='Subject', ax=ax)
+    x = np.linspace(my_df[x_var].min(),my_df[x_var].max())
+
+    m_base, m_exp = f"{intercept:.2e}".split('e')
+    k_base, k_exp = f"{abs(slope):.2e}".split('e')
+
+    if slope < 0:
+        sign = '-'
+    else:
+        sign = '+'
+
+    ax.plot(x, intercept + x*slope, '--k', label=rf'{y_var}$ = {m_base}\cdot 10^{int(m_exp)} {sign} {x_var} \cdot {k_base} \cdot 10^{int(k_exp)} $')
+
+    # Remove seaborn legend entries
+    handles, labels = ax.get_legend_handles_labels()
+    handles = [handle for handle, label in zip(handles, labels) if 'P0' not in label]
+    labels = [label for label in labels if 'P0' not in label]
+    ax.legend(handles=handles, labels=labels)
+
+    # mixedLM doesn't work here since the data is grouped a lot and doesn't make sense to look at individual groups then.
+    xlm_model = smf.mixedlm(f"{y_var} ~ {x_var}", my_df, groups=my_df['Subject'])
+    xlm_res = xlm_model.fit(method=['lbfgs'])
+    slope = xlm_res.params[x_var]
+    intercept = xlm_res.params.Intercept
+    print(xlm_res.summary())
+
+    for l in ax.get_lines():
+        ll = l.get_label()
+        if 'P0' in ll:
+            c = l.get_color()
+            xmin = my_df[my_df['Subject']==ll][x_var].min()
+            xmax = my_df[my_df['Subject']==ll][x_var].max()
+            x = np.linspace(xmin, xmax)
+            inter = xlm_res.random_effects[ll].Group
+            plt.plot(x, x*slope + inter + intercept, color=c)
+
+    ax.set_xlabel('Temperature [MHz]')
+    plt.show()
