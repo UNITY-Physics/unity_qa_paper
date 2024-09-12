@@ -7,6 +7,7 @@ The results in here were produced using the [`ghost`](https://github.com/UNITY-P
 ## Python dependencies
 
 Example of how to set up python environment with conda
+
 ```sh
 conda create --name qa_paper python=3.9
 conda activate qa_paper
@@ -14,20 +15,27 @@ python3 -m pip install -r requirements.txt
 python3 -m ipykernel install --user --name=qa_paper
 ```
 
-
 ## Organisation
 
-```
+```txt
 ├── data (csv data for stats)
 ├── nnUNet (related to the nnUNet fiducial segmentation)
-├── python (Code to generate results)
+├── notebooks (Code to generate results)
 └── results (Output folder for results)
     └── figures (Paper figures)
 ```
 
-## Reroduce figures from paper
+## Notebooks to reproduce figures from paper
 
-This will go through section by section how results were produced.
+- [`site_overview.ipynb`](notebooks/site_overview.ipynb): Overview of all the scans from the sites. Supplemental materials figure S1 and S2.
+- [`relaxivity_plots.ipynb`](notebooks/relaxivity_plots.ipynb): Analysis of T1 and T2 relaxation in the phantom. Paper figure 5.
+- [`PSNR.ipynb`](notebooks/PSNR.ipynb): Analysis of temperature and Larmor frequency as well as the PSNR and SSIM analysis. Paper figures 6 and 7. Also simulation of PSNR, SSIM and SNR figure S4.
+- [`contrast.ipynb`](notebooks/contrast.ipynb): Analysis of image contrast. Paper figure 8.
+- [`distortions_2D.ipynb`](notebooks/distortions_2D.ipynb): Analysis of in-plane distortions. Paper figure 9 and 10.
+- [`longitudinal.ipynb`](notebooks/longitudinal.ipynb): Longitudinal analysis from one site. Paper figure 11.
+- [`nnUNet_reproducibility.ipynb`](notebooks/nnUNet_reproducibility.ipynb): Reproducibility analysis of the fiducial segmentation with nnUNet. Supplemental materials figure S5.
 
-### Relaxometry
+Two additional python files are included with various functions required by the notebooks
 
+- `dataframe_help.py`: General functions to process the stats data frames.
+- `stats_help.py`: Specialized stats functions.
