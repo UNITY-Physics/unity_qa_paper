@@ -83,3 +83,15 @@ def bootstrap_formula(df, formula, num_bootstrap=100, num_coeff=23):
     # Calculate the mean and standard error of the coefficients
 
     return coefs
+
+def bootstrap_validate(df, model, formula, num_bootstrap=500):
+    coefs = bootstrap_formula(df, formula, num_bootstrap=num_bootstrap, num_coeff=len(model.params))
+
+    fig = plt.figure(figsize=(8,12))
+    dff = pd.DataFrame(columns=model.params.index, data=coefs).drop(columns='Intercept').melt()
+    df_val = model.params.reset_index().rename(columns={0:'value', 'index':'variable'})
+    index_to_drop = df_val[df_val['variable'] == 'Intercept'].index
+    df_val = df_val.drop(index_to_drop)
+
+    sns.violinplot(data=dff, y='variable', x='value', orient='h', inner=None)
+    sns.stripplot(data=df_val, y='variable', x='value', orient='h')

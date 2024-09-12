@@ -59,15 +59,7 @@ def calc_contrast(df_master, con_ref):
     
     return df_contrast
 
-
-# def get_relax_df(mimics):
     
-#     if mimics not in valid_sheets:
-#         raise ValueError(f'Mimics must be one of: {valid_sheets}')
-
-#     return pd.read_excel(fname, sheet_name=mimics)
-    
-
 def add_relaxometry(df, results_path):
     print()
     df_T1 = pd.read_csv(f'{results_path}/relaxometry_NiCl_mimics.csv')
@@ -137,21 +129,17 @@ def make_fitline_str_e(res, param, y, x):
 
     return s
 
-def make_global_group_comparison(df, x_var, y_var, filter_temp=False):
+def make_global_group_comparison(df, ax, x_var, y_var, filter_temp=False):
     if filter_temp:
         my_df = df[df.Temperature<24]
     else:
         my_df = df.copy()
 
-    y = my_df[y_var]
-    X = sm.add_constant(my_df[x_var])
     ols_model = smf.ols(f'{y_var} ~ {x_var}', data=my_df)
     ols_res = ols_model.fit()
     slope = ols_res.params[x_var]
     intercept = ols_res.params.Intercept
-    print(ols_res.summary())
 
-    fig, ax = plt.subplots(1,1)
     sns.scatterplot(data=my_df, x=x_var, y=y_var, hue='Subject', ax=ax)
     x = np.linspace(my_df[x_var].min(),my_df[x_var].max())
 
@@ -171,12 +159,10 @@ def make_global_group_comparison(df, x_var, y_var, filter_temp=False):
     labels = [label for label in labels if 'P0' not in label]
     ax.legend(handles=handles, labels=labels)
 
-    # mixedLM doesn't work here since the data is grouped a lot and doesn't make sense to look at individual groups then.
     xlm_model = smf.mixedlm(f"{y_var} ~ {x_var}", my_df, groups=my_df['Subject'])
     xlm_res = xlm_model.fit(method=['lbfgs'])
     slope = xlm_res.params[x_var]
     intercept = xlm_res.params.Intercept
-    print(xlm_res.summary())
 
     for l in ax.get_lines():
         ll = l.get_label()
@@ -186,7 +172,6 @@ def make_global_group_comparison(df, x_var, y_var, filter_temp=False):
             xmax = my_df[my_df['Subject']==ll][x_var].max()
             x = np.linspace(xmin, xmax)
             inter = xlm_res.random_effects[ll].Group
-            plt.plot(x, x*slope + inter + intercept, color=c)
+            ax.plot(x, x*slope + inter + intercept, color=c)
 
-    ax.set_xlabel('Temperature [MHz]')
-    plt.show()
+    return ax, xlm_res, ols_res

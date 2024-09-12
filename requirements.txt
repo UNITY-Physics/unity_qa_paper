@@ -1,7 +1,9 @@
+ants
+bids
+jupyter
 matplotlib
-numpy
+numpy<2.0
 pandas
 seaborn
 statsmodels
-jupyter
 tqdm
