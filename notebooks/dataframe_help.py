@@ -1,10 +1,8 @@
 import pandas as pd
 from tqdm import tqdm
 import numpy as np
-import statsmodels.api as sm
 import statsmodels.formula.api as smf
 import seaborn as sns
-import matplotlib.pyplot as plt
 
 
 def add_temperature_w0_sw(df, data_path):

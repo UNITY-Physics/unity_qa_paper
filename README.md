@@ -1,8 +1,8 @@
 # UNITY QA Paper
 
-Contains code to reproduce results for the UNITY QA Paper (in preparation). Original source data is not shared, but compiled results in form of .csv files are shared in here. 
+Contains code to reproduce results for the UNITY QA Paper (in preparation). Original source data is not shared, but compiled results in form of .csv files are shared in here.
 
-The results in here were produced using the [`ghost`](https://github.com/UNITY-Physics/GHOST) framework, but this is not required to reproduce the figures and stats in the paper. The [`ghost`](https://github.com/UNITY-Physics/GHOST) repository contains examples of how to run the type of analysis used in the paper.
+The results in here were produced using the [`ghost`](https://github.com/UNITY-Physics/GHOST) framework, but this is not required to reproduce most of the figures and stats in the paper. The [`ghost`](https://github.com/UNITY-Physics/GHOST) repository contains examples of how to run the type of analysis used in the paper.
 
 ## Python dependencies
 
@@ -14,6 +14,8 @@ conda activate qa_paper
 python3 -m pip install -r requirements.txt
 python3 -m ipykernel install --user --name=qa_paper
 ```
+
+The `PSNR` notebook also requires the `ghost` repository to be installed with the `Caliber137` model downloaded.
 
 ## Organisation
 
