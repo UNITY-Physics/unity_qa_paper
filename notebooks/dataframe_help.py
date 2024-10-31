@@ -4,10 +4,17 @@ import numpy as np
 import statsmodels.formula.api as smf
 import seaborn as sns
 
+temp_thr = [24.5, 23.5, 22, 21, 20, 19, 18, 16.9, 15.8, 14.8, 0] 
+# These are transition temperatures corresponding to how many black vials are visible.
+# With 0 visible, the temperature is above 24.5 With 10 visible the temperature is below 14.8 which
+# we here write to 0 to indicate it would be anything below 14.8
 
 def add_temperature_w0_sw(df, data_path):
     df_temp = pd.read_csv(f'{data_path}/session_params.csv')
-    df_temp['Temperature'] = 24-df_temp['n_black']
+    # df_temp['Temperature'] = 24-df_temp['n_black']
+    df_temp['Temperature'] = 0.0
+    for i, row in df_temp.iterrows():
+        df_temp.loc[i, 'Temperature'] = temp_thr[int(row['n_black'])]
 
     df['Temperature'] = None
     df['w0'] = None
