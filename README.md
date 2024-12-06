@@ -29,15 +29,16 @@ The `PSNR` notebook also requires the `ghost` repository to be installed with th
 
 ## Notebooks to reproduce figures from paper
 
-- [`site_overview.ipynb`](notebooks/site_overview.ipynb): Overview of all the scans from the sites. Supplemental materials figure S1 and S2.
-- [`relaxivity_plots.ipynb`](notebooks/relaxivity_plots.ipynb): Analysis of T1 and T2 relaxation in the phantom. Paper figure 5.
-- [`PSNR.ipynb`](notebooks/PSNR.ipynb): Analysis of temperature and Larmor frequency as well as the PSNR and SSIM analysis. Paper figures 6 and 7. Also simulation of PSNR, SSIM and SNR figure S4.
-- [`contrast.ipynb`](notebooks/contrast.ipynb): Analysis of image contrast. Paper figure 8.
-- [`distortions_2D.ipynb`](notebooks/distortions_2D.ipynb): Analysis of in-plane distortions. Paper figure 9 and 10.
-- [`longitudinal.ipynb`](notebooks/longitudinal.ipynb): Longitudinal analysis from one site. Paper figure 11.
-- [`nnUNet_reproducibility.ipynb`](notebooks/nnUNet_reproducibility.ipynb): Reproducibility analysis of the fiducial segmentation with nnUNet. Supplemental materials figure S5.
+- [`site_overview.ipynb`](notebooks/site_overview.ipynb): Overview of all the scans from the sites. Supplemental materials figure S2 and S3.
+- [`relaxivity_plots.ipynb`](notebooks/relaxivity_plots.ipynb): Analysis of T1 and T2 relaxation in the phantom. Paper figure 3 and S7.
+- [`PSNR.ipynb`](notebooks/PSNR.ipynb): Analysis of temperature and Larmor frequency as well as the PSNR and SSIM analysis. Paper figure 4, 5 and S4.
+- [`contrast.ipynb`](notebooks/contrast.ipynb): Analysis of image contrast. Paper figure 6.
+- [`distortions.ipynb`](notebooks/distortions.ipynb): Analysis of in-plane distortions. Paper figure 7 and 8.
+- [`longitudinal.ipynb`](notebooks/longitudinal.ipynb): Longitudinal analysis from one site. Paper figure 9.
+- [`nnUNet_reproducibility.ipynb`](notebooks/nnUNet_reproducibility.ipynb): Reproducibility analysis of the fiducial segmentation with nnUNet. Supplemental materials figure S5 and S6.
 
-Two additional python files are included with various functions required by the notebooks
+Additional python files are included with various functions required by the notebooks
 
 - `dataframe_help.py`: General functions to process the stats data frames.
+- `distortions_help.py`: General functions to process distortion.
 - `stats_help.py`: Specialized stats functions.
